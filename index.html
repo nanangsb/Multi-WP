@@ -35,18 +35,7 @@
 		
 	
 	<h1>Multi WP Blog Search</h1>
-	<p><a href="https://github.com/troutcolor/wp-sites-search">wp-sites-search - github</a></p>
-		<p>I started playing with the WordPress API using ideas from <a href="https://bionicteaching.com/api-nirvana-functional-details/">API Nirvana – Functional Details</a>, then I remembered CogDog's <a href="https://cogdogblog.com/code/wp_search_maker.php" title="Make A WordPress Search Bookmarklet">WordPress search javascript bookmarklet</a>.</p>
 	
-<p>This is a quick test of the <a href="http://v2.wp-api.org/">WP REST API</a> searching across multiple blogs.</p>
-<p>There is little in the way of error checking...</p>
-<p>You can kick off a search on the page by adding a hash & the search term to the url:
-<br><a href="http://git.johnj.info/wp-sites-search/#twitter" title="Multi WP Blog search">http://git.johnj.info/wp-sites-search/#twitter</a></p>
-
-
-
-<h2>Blogs to Search</h2>
-<p>This is a bit messy, you can delete these blogs and add other ones. The blogs need to support the WP rest API and cross domain access (<strong>I think</strong>). </p> 
 	<ul id="bloglist">
 		
 	</ul>
@@ -105,7 +94,7 @@ var searchBlogList = function() {
 	blogcount = bloglist.length;
 	for (var i = 0; i < bloglist.length; i++) {
 		 
-		u = bloglist[i][0] + '/wp-json/wp/v2/posts/?search=' + searchterm+'&per_page='+$('#per_page').val();;
+		u = bloglist[i][0] + '&search=' + searchterm;
 		//console.log(u);
 		searchPosts(u, bloglist[i][1]);
 
@@ -198,7 +187,7 @@ var rem = function(i){
 }
 
 $(document).ready(function() {
-	var tempA =["https://johnjohnston.info/blog", "john"] 
+	var tempA =["https://muslim.or.id/wp-json/wp/v2/posts/?per_page=100", "muslim"] 
 	bloglist.push(tempA);	
 	var tempA =["https://bionicteaching.com", "bionicteaching"];
 	bloglist.push(tempA);
