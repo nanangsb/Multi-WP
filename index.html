@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+ <base target="_blank">
+  <title>Multi WP Blog search</title>
+  <meta name="description" content="Multi WP Blog search a bit of a test">
+  <meta name="author" content="John Johnston">
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+
+   <style type="text/css" media="screen">
+   body{font-family: Helvetica, "MS Trebuchet", sans-serif;text-align:center;background: url('https://c2.staticflickr.com/8/7782/17530637049_2b9b12efa0_o.jpg')no-repeat center center fixed;background-size:cover;padding:0px;margin:0px;}
+   h1 {margin:0px;padding:10px;}
+   #main{text-align:left;width:720px;margin:0px auto;background:#fff;padding:0px 10px;opacity: 0.8;
+   -moz-opacity: 0.8;
+      filter:alpha(opacity=80);
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  }
+   #sorted{padding:10px;}
+   #sorted li{padding:10px;margin-left:3em;}
+   #bloglist{width:400px; list-style: none;}
+
+   #bloglist li{padding: 2px ;border:solid 1px lightgrey;margin:1px;}
+   #bloglist li:nth-child(even) {background: #CCC}
+   #bloglist li button{float:right;}
+   
+   </style>
+   
+</head>
+
+<body>
+	<div id="main">
+		
+	
+	<h1>Multi WP Blog Search</h1>
+	<p><a href="https://github.com/troutcolor/wp-sites-search">wp-sites-search - github</a></p>
+		<p>I started playing with the WordPress API using ideas from <a href="https://bionicteaching.com/api-nirvana-functional-details/">API Nirvana – Functional Details</a>, then I remembered CogDog's <a href="https://cogdogblog.com/code/wp_search_maker.php" title="Make A WordPress Search Bookmarklet">WordPress search javascript bookmarklet</a>.</p>
+	
+<p>This is a quick test of the <a href="http://v2.wp-api.org/">WP REST API</a> searching across multiple blogs.</p>
+<p>There is little in the way of error checking...</p>
+<p>You can kick off a search on the page by adding a hash & the search term to the url:
+<br><a href="http://git.johnj.info/wp-sites-search/#twitter" title="Multi WP Blog search">http://git.johnj.info/wp-sites-search/#twitter</a></p>
+
+
+
+<h2>Blogs to Search</h2>
+<p>This is a bit messy, you can delete these blogs and add other ones. The blogs need to support the WP rest API and cross domain access (<strong>I think</strong>). </p> 
+	<ul id="bloglist">
+		
+	</ul>
+	add URL: <input type="text" name="addurl" value="" id="addurl"> Name:<input type="text" name="addblogname" value="" id="addblogname"> <button onclick="addtolist();">add</button>
+	
+<h2>Search</h2>
+
+<div id="searchbox">
+	Max search results per blog: <select name="per_page" id="per_page"  onchange="" size="1">
+		<option value="2">2</option>
+		<option selected value="10">10</option>
+		<option value="20">20</option>
+		<option value="30">30</option>
+		<option value="50">50</option>
+	</select>
+	<input type="text" name="search" value="" id="search"> <button id="searchbutton" onclick="searchBlogList();">Search</button>
+</div>
+<div id="posts" class="postholder">
+	<div id="errors">
+		
+	</div>
+	
+	<h3>Results</h3>
+	<ul id="sorted">
+		
+	</ul>
+</div>
+	
+ </div>
+ 
+<script type="text/javascript">
+
+document.getElementById("search")
+    .addEventListener("keyup", function(event) {
+    event.preventDefault();
+    if (event.keyCode == 13) {
+        document.getElementById("searchbutton").click();
+    }
+});
+
+var bloglist= new Array;
+
+var thecount = 0;
+var blogcount;
+var postsArray = new Array;
+
+var searchBlogList = function() {
+	$('#errors').html('');
+	postsArray.length = 0;
+
+	$('#sorted').html('');
+	var searchterm = $('#search').val();
+	$('#posts').append('<img src="spinner-2x.gif" class="waiting">');
+	thecount = 0;
+	 
+	blogcount = bloglist.length;
+	for (var i = 0; i < bloglist.length; i++) {
+		 
+		u = bloglist[i][0] + '/wp-json/wp/v2/posts/?search=' + searchterm+'&per_page='+$('#per_page').val();;
+		//console.log(u);
+		searchPosts(u, bloglist[i][1]);
+
+	}
+
+
+}
+
+ 
+
+var searchPosts = function(theurl, el) {
+	$.ajax({
+		url: theurl,
+
+		jsonp: "cb",
+
+		dataType: 'json',
+
+		success: function(data) {
+
+				console.log(data); //dumps the data 
+
+				$.each(data, function(index, item) {     
+					var newitem = new Array;
+					newitem[0] = '<a  href="' + item.link + '">' + item.title.rendered + '</a>';
+					newitem[1] = item.date.substring(0, 10);
+					newitem[2] = el;
+					postsArray.push(newitem);
+
+ 
+				}); //each
+				$(el).find('.waiting').hide();
+				thecount++;
+				if (thecount == blogcount) {
+					sortsearch()
+				};
+
+			} //success
+			,
+		error: function(xhr, ajaxOptions, thrownError) {
+			$('#errors').append(el + " FAIL " + thrownError + '<br>');
+			console.log("xhr.responseText "+xhr.responseText);
+			console.log("ajaxOptions "+ajaxOptions);
+			console.log("thrownError "+thrownError);
+			blogcount = blogcount - 1;
+		}
+	}); //ajax
+}
+
+
+function sortFunction(a, b) {
+	if (a[1] < b[1]) return 1;
+	if (a[1] > b[1]) return -1;
+	return 0;
+}
+
+
+var sortsearch = function() {
+	var htmlresults = "";
+	postsArray.sort(sortFunction);
+	for (var i = 0; i < postsArray.length; i++) {
+		htmlresults = htmlresults + "<li>" + postsArray[i][0] + ' || ' + postsArray[i][1] +" " + postsArray[i][2] + "</li>";
+	}
+	//console.log(htmlresults);
+	$('#sorted').html(htmlresults);
+	$('.waiting').hide();
+}
+
+var addtolist = function() {
+	var tempA = [$('#addurl').val(), $('#addblogname').val()];
+	bloglist.push(tempA);
+	showbloglist(bloglist);
+	$('#addurl').val('');
+	$('#addblogname').val('');
+}
+
+
+var showbloglist=function(bloglist){
+	
+	var t="";
+	for (var i = 0; i < bloglist.length; i++) {
+		t=t+ "<li>"+ bloglist[i][0]+" - "+bloglist[i][1]+ " <button onclick='rem("+i+")'>X</button></li>"
+	}
+	$('#bloglist').html(t);
+}
+
+var rem = function(i){
+   bloglist.splice(i,1);
+   showbloglist(bloglist);
+}
+
+$(document).ready(function() {
+	var tempA =["https://johnjohnston.info/blog", "john"] 
+	bloglist.push(tempA);	
+	var tempA =["https://bionicteaching.com", "bionicteaching"];
+	bloglist.push(tempA);
+	var tempA =["https://cogdogblog.com", "cogdogblog"];
+	bloglist.push(tempA);
+	
+	showbloglist(bloglist);
+	
+	
+  if(window.location.hash) {
+        var hash = window.location.hash.substring(1);
+		$('#search').val(hash);
+		searchBlogList();
+	}
+});
+
+ </script>
+	
+
+ </body>
+</html>
