@@ -84,10 +84,10 @@ var searchPosts = function(theurl, el) {
 		console.log(data); //dumps the data 
 		$.each(data, function(index, item) {  
 		var newitem = new Array;
-		newitem[0] = '<a  href="' + item.link + '">' + item.title.rendered + '</a>';
+		newitem[0] = '<h1>' + item.title.rendered + '</h1>';
 		newitem[1] = item.date.substring(0, 10);
-		newitem[2] = el;
-		newitem[3] = item.content.rendered;
+		newitem[2] = item.content.rendered;
+		newitem[3] = '<a  href="' + item.link + '">' Sumber</a>';
 		postsArray.push(newitem);
 	}); //each
 		$(el).find('.waiting').hide();
@@ -115,7 +115,7 @@ var sortsearch = function() {
 	var htmlresults = "";
 	postsArray.sort(sortFunction);
 	for (var i = 0; i < postsArray.length; i++) {
-		htmlresults = htmlresults + "<li>" + postsArray[i][0] + ' || ' + postsArray[i][1] +" " + postsArray[i][2] + "<br />"  + postsArray[i][3] + "</li>";
+		htmlresults = htmlresults + "<!-- ###################################### -->" + "<li>" + postsArray[i][0] + "<br />" + postsArray[i][1] +"<br />" + postsArray[i][2] + "<br />"  + postsArray[i][3] + "</li><br />";
 	}
 	//console.log(htmlresults);
 	$('#sorted').html(htmlresults);
