@@ -115,7 +115,7 @@ var sortsearch = function() {
 	var htmlresults = "";
 	postsArray.sort(sortFunction);
 	for (var i = 0; i < postsArray.length; i++) {
-		htmlresults = htmlresults + "<!-- ###################################### -->" + "<li>" + postsArray[i][0] + "<br />" + postsArray[i][1] +"<br />" + postsArray[i][2] + "<br />"  + postsArray[i][3] + "</li><br />";
+		htmlresults = htmlresults + "<li>" + postsArray[i][0] + "<br />" + postsArray[i][1] +"<br />" + postsArray[i][2] + "<br />"  + postsArray[i][3] + "</li><br />";
 	}
 	//console.log(htmlresults);
 	$('#sorted').html(htmlresults);
