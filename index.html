@@ -87,7 +87,7 @@ var searchPosts = function(theurl, el) {
 		newitem[0] = '<h1>' + item.title.rendered + '</h1>';
 		newitem[1] = item.date.substring(0, 10);
 		newitem[2] = item.content.rendered;
-		newitem[3] = '<a  href="' + item.link + '">' Sumber</a>';
+		newitem[3] = '<a  href="' + item.link + '">Sumber</a>';
 		postsArray.push(newitem);
 	}); //each
 		$(el).find('.waiting').hide();
